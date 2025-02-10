@@ -1,45 +1,39 @@
+require("dotenv").config();
 const express = require("express");
-const fs = require("fs");
 const cors = require("cors");
+const { Pool } = require("pg");
 
 const app = express();
-const PORT = 3000;
-const FILE_PATH = "itens.json";
+const PORT = process.env.PORT || 3000;
+
+// Configuração do banco de dados Neon
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL, // Variável de ambiente
+    ssl: { rejectUnauthorized: false } // Necessário para o Neon
+});
 
 app.use(express.json());
-app.use(cors({
-    origin: "*",
-    methods: ["GET", "POST"]
-}));
-
-// Função para ler o arquivo JSON
-function readJsonFile() {
-    if (!fs.existsSync(FILE_PATH)) {
-        fs.writeFileSync(FILE_PATH, "[]", "utf8"); // Se não existir, cria um JSON vazio
-    }
-    const data = fs.readFileSync(FILE_PATH, "utf8");
-    return JSON.parse(data);
-}
+app.use(cors({ origin: "*", methods: ["GET", "POST"] }));
 
 // Rota para obter os itens cadastrados
-app.get("/items", (req, res) => {
+app.get("/items", async (req, res) => {
     try {
-        const items = readJsonFile();
-        res.json(items);
+        const result = await pool.query("SELECT * FROM itens");
+        res.json(result.rows);
     } catch (error) {
-        console.error("Erro ao ler itens:", error);
-        res.status(500).json({ error: "Erro ao ler itens." });
+        console.error("Erro ao buscar itens:", error);
+        res.status(500).json({ error: "Erro ao buscar itens" });
     }
 });
 
 // Rota para adicionar um novo item
-app.post("/items", (req, res) => {
+app.post("/items", async (req, res) => {
     try {
         const { nome, link, imagens } = req.body;
-        const items = readJsonFile();
-        items.push({ nome, link, imagens });
+        const imagensString = imagens.join(", ");
 
-        fs.writeFileSync(FILE_PATH, JSON.stringify(items, null, 2), "utf8");
+        await pool.query("INSERT INTO itens (nome, link, imagens) VALUES ($1, $2, $3)", 
+            [nome, link, imagensString]);
 
         res.json({ success: true, message: "Item salvo com sucesso!" });
     } catch (error) {
@@ -48,6 +42,11 @@ app.post("/items", (req, res) => {
     }
 });
 
+// Rota principal para evitar erro "Cannot GET /"
+app.get("/", (req, res) => {
+    res.send("Servidor rodando corretamente! 🚀");
+});
+
 app.listen(PORT, () => {
-    console.log(`Servidor rodando em https://shoplinkbr.vercel.app:${PORT}`);
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
