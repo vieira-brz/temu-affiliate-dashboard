@@ -166,7 +166,7 @@
         let itemsData = []; // Armazena os itens carregados
 
         async function fetchItems() {
-            const response = await fetch("https://shoplinkbr.vercel.app/items");
+            const response = await fetch("https://shoplinkbr.vercel.app/api/items");
             const items = await response.json();
             itemsData = items; // Salva os itens carregados
             renderItems(itemsData);

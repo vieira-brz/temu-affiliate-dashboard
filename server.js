@@ -2,21 +2,34 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuração do banco de dados Neon
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL, // Variável de ambiente
-    ssl: { rejectUnauthorized: false } // Necessário para o Neon
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
 });
 
 app.use(express.json());
-app.use(cors({ origin: "*", methods: ["GET", "POST"] }));
+app.use(cors({ origin: "*" }));
 
-// Rota para obter os itens cadastrados
-app.get("/items", async (req, res) => {
+// 🔥 Servir arquivos estáticos (HTML, CSS, JS, imagens, etc.)
+app.use(express.static(path.join(__dirname)));
+
+// 🔹 Servir o index.html na raiz
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// 🔹 Servir a página de cadastro corretamente
+app.get("/cadastro-de-links-programa-de-afiliados-temu-brasil", (req, res) => {
+    res.sendFile(path.join(__dirname, "cadastro-de-links-programa-de-afiliados-temu-brasil.html"));
+});
+
+// 🔹 API para buscar os itens no banco
+app.get("/api/items", async (req, res) => {
     try {
         const result = await pool.query("SELECT * FROM itens");
         res.json(result.rows);
@@ -26,8 +39,8 @@ app.get("/items", async (req, res) => {
     }
 });
 
-// Rota para adicionar um novo item
-app.post("/items", async (req, res) => {
+// 🔹 API para adicionar novos itens
+app.post("/api/items", async (req, res) => {
     try {
         const { nome, link, imagens } = req.body;
         const imagensString = imagens.join(", ");
@@ -40,11 +53,6 @@ app.post("/items", async (req, res) => {
         console.error("Erro ao salvar item:", error);
         res.status(500).json({ error: "Erro ao salvar item." });
     }
-});
-
-// Rota principal para evitar erro "Cannot GET /"
-app.get("/", (req, res) => {
-    res.send("Servidor rodando corretamente! 🚀");
 });
 
 app.listen(PORT, () => {
