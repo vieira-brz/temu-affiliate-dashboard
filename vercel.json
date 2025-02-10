@@ -18,6 +18,14 @@
         {
             "src": "/(.*)",
             "dest": "/index.html"
+        },
+        {
+            "src": "/cadastro-de-links-programa-de-afiliados-temu-brasil.html",
+            "dest": "/cadastro-de-links-programa-de-afiliados-temu-brasil.html"
+        },
+        {
+            "src": "/index.html",
+            "dest": "/index.html"
         }
     ]
 }
