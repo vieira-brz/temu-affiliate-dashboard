@@ -49,5 +49,5 @@ app.post("/items", (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Servidor rodando em https://temu-affiliate-dashboard-k1qmm6t7d-vinicius-brazs-projects.vercel.app:${PORT}`);
+    console.log(`Servidor rodando em https://shoplinkbr.vercel.app:${PORT}`);
 });
