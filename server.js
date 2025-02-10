@@ -7,7 +7,11 @@ const PORT = 3000;
 const FILE_PATH = "itens.json";
 
 app.use(express.json());
-app.use(cors());
+const cors = require("cors");
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST"]
+}));
 
 // Função para ler o arquivo JSON
 function readJsonFile() {
