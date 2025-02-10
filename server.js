@@ -1,52 +1,45 @@
-require("dotenv").config();
 const express = require("express");
+const fs = require("fs");
 const cors = require("cors");
-const { Pool } = require("pg");
-const path = require("path");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-});
+const PORT = 3000;
+const FILE_PATH = "itens.json";
 
 app.use(express.json());
-app.use(cors({ origin: "*" }));
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST"]
+}));
 
-// 🔥 Servir arquivos estáticos (HTML, CSS, JS, imagens, etc.)
-app.use(express.static(path.join(__dirname)));
+// Função para ler o arquivo JSON
+function readJsonFile() {
+    if (!fs.existsSync(FILE_PATH)) {
+        fs.writeFileSync(FILE_PATH, "[]", "utf8"); // Se não existir, cria um JSON vazio
+    }
+    const data = fs.readFileSync(FILE_PATH, "utf8");
+    return JSON.parse(data);
+}
 
-// 🔹 Servir o index.html na raiz
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
-});
-
-// 🔹 Servir a página de cadastro corretamente
-app.get("/cadastro-de-links-programa-de-afiliados-temu-brasil", (req, res) => {
-    res.sendFile(path.join(__dirname, "cadastro-de-links-programa-de-afiliados-temu-brasil.html"));
-});
-
-// 🔹 API para buscar os itens no banco
-app.get("/api/items", async (req, res) => {
+// Rota para obter os itens cadastrados
+app.get("/items", (req, res) => {
     try {
-        const result = await pool.query("SELECT * FROM itens");
-        res.json(result.rows);
+        const items = readJsonFile();
+        res.json(items);
     } catch (error) {
-        console.error("Erro ao buscar itens:", error);
-        res.status(500).json({ error: "Erro ao buscar itens" });
+        console.error("Erro ao ler itens:", error);
+        res.status(500).json({ error: "Erro ao ler itens." });
     }
 });
 
-// 🔹 API para adicionar novos itens
-app.post("/api/items", async (req, res) => {
+// Rota para adicionar um novo item
+app.post("/items", (req, res) => {
     try {
         const { nome, link, imagens } = req.body;
-        const imagensString = imagens.join(", ");
+        const items = readJsonFile();
+        items.push({ nome, link, imagens });
 
-        await pool.query("INSERT INTO itens (nome, link, imagens) VALUES ($1, $2, $3)", 
-            [nome, link, imagensString]);
+        fs.writeFileSync(FILE_PATH, JSON.stringify(items, null, 2), "utf8");
 
         res.json({ success: true, message: "Item salvo com sucesso!" });
     } catch (error) {
@@ -56,5 +49,5 @@ app.post("/api/items", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`Servidor rodando em https://shoplinkbr.vercel.app:${PORT}`);
 });

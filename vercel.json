@@ -4,6 +4,14 @@
         {
             "src": "server.js",
             "use": "@vercel/node"
+        },
+        {
+            "src": "index.html",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "cadastro-de-links-programa-de-afiliados-temu-brasil.html",
+            "use": "@vercel/static"
         }
     ],
     "routes": [
@@ -12,12 +20,8 @@
             "dest": "/server.js"
         },
         {
-            "src": "/cadastro-de-links-programa-de-afiliados-temu-brasil",
-            "dest": "/cadastro-de-links-programa-de-afiliados-temu-brasil.html"
-        },
-        {
             "src": "/(.*)",
-            "dest": "/index.html"
+            "dest": "/$1"
         }
     ]
 }
