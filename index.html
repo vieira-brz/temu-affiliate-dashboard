@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Itens Cadastrados</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #2b2b2b;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        a {
+            display: block;
+            margin: 15px 0;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.2s ease;
+        }
+
+        a:hover {
+            background: #0056b3;
+        }
+
+        .items-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            scrollbar-color: #ccc transparent;
+        }
+
+        .item {
+            background: black;
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 220px;
+            max-width: 220px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            flex-wrap: wrap;
+            margin: 10px 15px;
+            justify-content: center;
+            border: 1px solid rgb(0, 0, 0);
+        }
+
+        /* Contêiner da imagem com setas */
+        .image-container {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* Botões de navegação (setas) dentro da imagem */
+        .image-container .prev,
+        .image-container .next {
+            position: absolute;
+            top: 45%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 7px 2px 7px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 50%;
+            opacity: 0.5;
+            transition: 0.1s;
+        }
+
+        .image-container .prev:hover,
+        .image-container .next:hover {
+            opacity: 1;
+        }
+
+        .image-container .prev {
+            left: 5px;
+        }
+
+        .image-container .next {
+            right: 5px;
+        }
+
+        /* Estilização do botão "Acessar" */
+        .item button {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border: none;
+            background: #333;
+            color: white;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .item button:hover {
+            background: #00aa6c;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0dd28a !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <center style="margin-bottom: 20px;">
+            <h3 style="color:white; margin-bottom: 20px;">Filtre seu produto</h3>
+            <input type="text" id="searchInput" placeholder="Digite aqui para buscar..."
+                style="color:white; background: transparent; max-width: 400px; border: none; border-bottom: 1px solid white;">
+        </center>
+        <!-- <a href="cadastro-de-links-programa-de-afiliados-temu-brasil.html">Cadastrar Novo Item</a> -->
+        <div id="itemsContainer"></div>
+    </div>
+
+    <script>
+        let itemsData = []; // Armazena os itens carregados
+
+        async function fetchItems() {
+            const response = await fetch("http://localhost:3000/items");
+            const items = await response.json();
+            itemsData = items; // Salva os itens carregados
+            renderItems(itemsData);
+        }
+
+        function renderItems(items) {
+            const container = document.getElementById("itemsContainer");
+            container.innerHTML = "";
+
+            items.forEach((item, index) => {
+                let currentIndex = 0;
+                const images = item.imagens;
+
+                const itemDiv = document.createElement("div");
+                itemDiv.className = "item";
+                itemDiv.dataset.index = currentIndex; // Armazena o índice da imagem atual
+
+                itemDiv.innerHTML = `
+                    <h3 style="color:lightgray; font-size: 16px; margin: 0 0 15px 0;">${item.nome}</h3>
+                    <div class="image-container">
+                        <button class="prev" onclick="changeImage(${index}, -1)">&#10094;</button>
+                        <img id="item-img-${index}" src="${images[0]}" alt="Imagem">
+                        <button class="next" onclick="changeImage(${index}, 1)">&#10095;</button>
+                    </div>
+                    <button onclick="window.open('${item.link}', '_blank')" style="margin-top: 15px;">Acessar</button>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        // Função para mudar a imagem ao clicar na seta
+        function changeImage(index, direction) {
+            const imgElement = document.getElementById(`item-img-${index}`);
+            const itemDiv = imgElement.closest(".item");
+            let currentIndex = parseInt(itemDiv.dataset.index);
+            const images = itemsData[index].imagens; // Pega as imagens diretamente dos dados carregados
+
+            currentIndex += direction;
+
+            // Evita ultrapassar os limites do array
+            if (currentIndex < 0) {
+                currentIndex = images.length - 1;
+            } else if (currentIndex >= images.length) {
+                currentIndex = 0;
+            }
+
+            imgElement.src = images[currentIndex]; // Atualiza a imagem
+            itemDiv.dataset.index = currentIndex; // Salva o novo índice
+        }
+
+        // Função para filtrar os itens conforme a pesquisa
+        function searchItems() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            const filteredItems = itemsData.filter(item => item.nome.toLowerCase().includes(query));
+            renderItems(filteredItems);
+        }
+
+        // Evento para chamar a pesquisa em tempo real
+        document.getElementById("searchInput").addEventListener("input", searchItems);
+
+        fetchItems();
+    </script>
+
+</body>
+
+</html>
