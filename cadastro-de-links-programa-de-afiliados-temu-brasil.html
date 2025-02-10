@@ -136,7 +136,7 @@ a:hover {
             const nome = document.getElementById("nomeInput").value;
             const link = document.getElementById("linkInput").value;
 
-            await fetch("https://shoplinkbr.vercel.app:3000/items", {
+            await fetch("https://temu-affiliate-dashboard-k1qmm6t7d-vinicius-brazs-projects.vercel.app:3000/items", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ nome, link, imagens: currentImages })
