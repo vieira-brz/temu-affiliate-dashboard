@@ -46,5 +46,5 @@ app.post("/items", (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
+    console.log(`Servidor rodando em https://shoplinkbr.vercel.app:${PORT}`);
 });
