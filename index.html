@@ -197,14 +197,15 @@
                 itemDiv.dataset.index = currentIndex; // Armazena o índice da imagem atual
 
                 itemDiv.innerHTML = `
-            <h3 style="color:lightgray; font-size: 16px; margin: 0 0 15px 0;">${item.nome}</h3>
-            <div class="image-container">
-                <button class="prev" onclick="changeImage(${index}, -1)">&#10094;</button>
-                <img id="item-img-${index}" src="${images[0]}" alt="Imagem">
-                <button class="next" onclick="changeImage(${index}, 1)">&#10095;</button>
-            </div>
-            <button onclick="window.open('${item.link}', '_blank')" style="margin-top: 15px;">Acessar</button>
-        `;
+                    <h3 style="color:lightgray; font-size: 16px; margin: 0 0 15px 0;">${item.nome}</h3>
+                    <h3 style="color:lightgray; font-size: 12px; margin: 0 0 15px 0; color: orange;">${item.valor}</h3>
+                    <div class="image-container">
+                        <button class="prev" onclick="changeImage(${index}, -1)">&#10094;</button>
+                        <img id="item-img-${index}" src="${images[0]}" alt="Imagem">
+                        <button class="next" onclick="changeImage(${index}, 1)">&#10095;</button>
+                    </div>
+                    <button onclick="window.open('${item.link}', '_blank')" style="margin-top: 15px;">Acessar</button>
+                `;
                 container.appendChild(itemDiv);
             });
         }

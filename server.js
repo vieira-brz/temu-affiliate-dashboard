@@ -43,11 +43,11 @@ app.get("/api/items", async (req, res) => {
 // 🔹 API para adicionar novos itens
 app.post("/api/items", async (req, res) => {
     try {
-        const { nome, link, imagens } = req.body;
+        const { nome, link, imagens, valor } = req.body;
         const imagensString = imagens.join(", ");
 
-        await pool.query("INSERT INTO itens (nome, link, imagens) VALUES ($1, $2, $3)", 
-            [nome, link, imagensString]);
+        await pool.query("INSERT INTO itens (nome, link, imagens, valor) VALUES ($1, $2, $3, $4)", 
+            [nome, link, imagensString, valor]);
 
         res.json({ success: true, message: "Item salvo com sucesso!" });
     } catch (error) {
