@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Itens Cadastrados</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,7 +15,6 @@
         }
 
         .container {
-            max-width: 1000px;
             margin: auto;
             padding: 20px;
             border-radius: 10px;
@@ -75,7 +75,7 @@
             margin: 10px 15px;
             justify-content: center;
             border: 1px solid rgb(0, 0, 0);
-            height: 350px;
+            height: 365px;
         }
 
         /* Contêiner da imagem com setas */
@@ -85,6 +85,7 @@
             /* height: 150px; */
             overflow: hidden;
             border-radius: 8px;
+            margin-bottom: 50px;
         }
 
         .image-container img {
@@ -114,6 +115,18 @@
             border-radius: 50%;
             opacity: 0.5;
             transition: 0.1s;
+        }
+
+        .image-slider {
+            display: flex;
+            transition: transform 0.4s ease-in-out;
+            width: 100%;
+        }
+
+        .slider-img {
+            width: 100%;
+            flex-shrink: 0;
+            border-radius: 8px;
         }
 
         .image-container .prev:hover,
@@ -156,7 +169,7 @@
 <body>
 
     <div class="container">
-        <center style="margin-bottom: 20px;">
+        <center style="margin-bottom: 40px;">
             <h3 style="color:white; margin-bottom: 20px;">Filtre seu produto</h3>
             <input type="text" id="searchInput" placeholder="Digite aqui para buscar..."
                 style="color:white; background: transparent; max-width: 400px; border: none; border-bottom: 1px solid white;">
@@ -167,6 +180,10 @@
 
     <script>
         let itemsData = []; // Armazena os itens carregados
+
+        window.onload = () => {
+            document.getElementById("searchInput").focus();
+        };
 
         // Função para buscar itens do backend
         async function fetchItems() {
@@ -197,18 +214,37 @@
                 const itemDiv = document.createElement("div");
                 itemDiv.className = "item";
                 itemDiv.dataset.index = currentIndex; // Armazena o índice da imagem atual
+                itemDiv.style.position = 'relative'
+
+                link_temu = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEbDTaOwlmHd1sgH2NrrH4MGXsMERSBYQ_Qw&s'
+                link_shopee = 'data:image/png;base64,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'
+                link_null = 'data:image/png;base64,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'
+
+                style_plataforma = `
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50px;
+                    position: absolute;
+                    bottom: 17px;
+                    left: 15px;
+                    z-index: 999;
+                `
 
                 itemDiv.innerHTML = `
                     <div style="display:flex; flex-direction:column; align-items: center; justify-content:center;">
-                        <h3 style="color:lightgray; font-size: 14px; margin: 0 0 15px 0;">${item.nome}</h3>
-                        <h3 style="color:lightgray; font-size: 12px; margin: 0 0 15px 0; color: orange;">R$ ${item.valor}</h3>
+                        <h3 style="color:lightgray; font-size: 14px; margin: 0 0 10px 0;">${item.nome.split(' (')[0]}</h3>
+                        <h3 style="color:lightgray; font-size: 14px; margin: 0 0 10px 0;">(${item.nome.split(' (')[1]}</h3>
                     </div>
+                    <img style="${style_plataforma}" src="${item.plataforma === 'temu' ? link_temu : item.plataforma === 'shopee' ? link_shopee : link_null}">
                     <div class="image-container">
-                        <button class="prev" onclick="changeImage(${index}, -1)">&#10094;</button>
-                        <img id="item-img-${index}" src="${images[0]}" alt="Imagem">
-                        <button class="next" onclick="changeImage(${index}, 1)">&#10095;</button>
+                        <button style="font-weight:bold;" class="prev" onclick="changeImage(${index}, -1)">&#10094;</button>
+                        <div class="image-slider" id="image-slider-${index}">
+                            ${images.map(img => `<img class="slider-img" src="${img}" alt="Imagem">`).join('')}
+                        </div>
+                        <button style="font-weight:bold;" class="next" onclick="changeImage(${index}, 1)">&#10095;</button>
                     </div>
-                    <button onclick="window.open('${item.link}', '_blank')" style="margin-top: 15px;">Acessar</button>
+                    <h3 style="font-size: 15px; color: #0dd28a; font-weight: bold; position: absolute; bottom: 18px; left: 65px;">R$ ${item.valor}</h3>
+                    <button onclick="window.open('${item.link}', '_blank')" style="position: absolute; bottom: 21px; right: 15px;"">Acessar</button>
                 `;
                 container.appendChild(itemDiv);
             });
@@ -216,9 +252,8 @@
 
         // Função para mudar a imagem ao clicar na seta
         function changeImage(index, direction) {
-            const imgElement = document.getElementById(`item-img-${index}`);
-            const itemDiv = imgElement.closest(".item");
-            let currentIndex = parseInt(itemDiv.dataset.index);
+            const slider = document.getElementById(`image-slider-${index}`);
+            let currentIndex = parseInt(slider.dataset.index || 0);
             const images = itemsData[index].imagens;
 
             currentIndex += direction;
@@ -230,8 +265,8 @@
                 currentIndex = 0;
             }
 
-            imgElement.src = images[currentIndex]; // Atualiza a imagem
-            itemDiv.dataset.index = currentIndex; // Salva o novo índice
+            slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+            slider.dataset.index = currentIndex; // Salva o novo índice
         }
 
         // Função para filtrar os itens conforme a pesquisa
